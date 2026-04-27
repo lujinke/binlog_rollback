@@ -76,7 +76,8 @@ func SendBinlogEventRepl(cfg *ConfCmd, streamer *replication.BinlogStreamer, eve
 		sqlType string = ""
 		rowCnt  uint32 = 0
 
-		tbMapPos uint32 = 0
+		tbMapPos        uint32 = 0
+		currentThreadID uint32 = 0
 
 		justStart   bool = true
 		orgSqlEvent *replication.RowsQueryEvent
@@ -102,6 +103,9 @@ func SendBinlogEventRepl(cfg *ConfCmd, streamer *replication.BinlogStreamer, eve
 		if ev.Header.EventType == replication.TABLE_MAP_EVENT {
 			tbMapPos = ev.Header.LogPos - ev.Header.EventSize // avoid mysqlbing mask the row event as unknown table row event
 		}
+		if ev.Header.EventType == replication.QUERY_EVENT {
+			currentThreadID = ev.Event.(*replication.QueryEvent).SlaveProxyID
+		}
 		ev.RawData = []byte{} // we donnot need raw data
 
 		chkRe = CheckBinHeaderCondition(cfg, ev.Header, currentBinlog)
@@ -113,6 +117,9 @@ func SendBinlogEventRepl(cfg *ConfCmd, streamer *replication.BinlogStreamer, eve
 		} else if chkRe == C_reFileEnd {
 			continue
 		}
+		if ev.Header.EventType != replication.ROTATE_EVENT && !cfg.IsTargetThreadID(currentThreadID) {
+			continue
+		}
 
 		if cfg.IfWriteOrgSql && ev.Header.EventType == replication.ROWS_QUERY_EVENT {
 			orgSqlEvent = ev.Event.(*replication.RowsQueryEvent)
@@ -122,7 +129,7 @@ func SendBinlogEventRepl(cfg *ConfCmd, streamer *replication.BinlogStreamer, eve
 		}
 
 		oneMyEvent := &MyBinEvent{MyPos: mysql.Position{Name: currentBinlog, Pos: ev.Header.LogPos},
-			StartPos: tbMapPos}
+			StartPos: tbMapPos, ThreadID: currentThreadID}
 		//StartPos: ev.Header.LogPos - ev.Header.EventSize}
 		chkRe = oneMyEvent.CheckBinEvent(cfg, ev, &currentBinlog)
 		//gLogger.WriteToLogByFieldsNormalOnlyMsg(fmt.Sprintf("check binlog event result %d", chkRe), logging.INFO)

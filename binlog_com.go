@@ -50,6 +50,7 @@ type BinEventDbTableQuery struct {
 type MyBinEvent struct {
 	MyPos       mysql.Position //this is the end position
 	EventIdx    uint64
+	ThreadID    uint32
 	BinEvent    *replication.RowsEvent
 	StartPos    uint32 // this is the start position
 	IfRowsEvent bool
@@ -59,6 +60,10 @@ type MyBinEvent struct {
 	TrxStatus   int           // 0:begin, 1: commit, 2: rollback, -1: in_progress
 	QuerySql    *dsql.SqlInfo // for ddl and binlog which is not row format
 	OrgSql      string        // for ddl and binlog which is not row format
+}
+
+func (this *ConfCmd) IsTargetThreadID(threadID uint32) bool {
+	return !this.IfSetThreadID || threadID == uint32(this.ThreadID)
 }
 
 func CheckBinHeaderCondition(cfg *ConfCmd, header *replication.EventHeader, currentBinlog string) int {

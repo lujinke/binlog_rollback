@@ -118,8 +118,9 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, evChan chan M
 		rowCnt      uint32 = 0
 		trxStatus   int    = 0
 		sqlLower    string = ""
-		tbMapPos    uint32 = 0
-		orgSqlEvent *replication.RowsQueryEvent
+		tbMapPos        uint32 = 0
+		currentThreadID uint32 = 0
+		orgSqlEvent     *replication.RowsQueryEvent
 	)
 
 	for {
@@ -178,6 +179,9 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, evChan chan M
 				logging.ERROR, ehand.ERR_BINEVENT_BODY)
 			return C_reBreak, errors.Trace(err)
 		}
+		if h.EventType == replication.QUERY_EVENT {
+			currentThreadID = e.(*replication.QueryEvent).SlaveProxyID
+		}
 		if h.EventType == replication.TABLE_MAP_EVENT {
 			tbMapPos = h.LogPos - h.EventSize // avoid mysqlbing mask the row event as unknown table row event
 		}
@@ -191,6 +195,9 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, evChan chan M
 		} else if chRe == C_reFileEnd {
 			return C_reFileEnd, nil
 		}
+		if h.EventType != replication.ROTATE_EVENT && !cfg.IsTargetThreadID(currentThreadID) {
+			continue
+		}
 		if cfg.IfWriteOrgSql && h.EventType == replication.ROWS_QUERY_EVENT {
 			orgSqlEvent = e.(*replication.RowsQueryEvent)
 			orgSqlChan <- OrgSqlPrint{Binlog: *binlog, DateTime: h.Timestamp,
@@ -201,7 +208,7 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, evChan chan M
 		//binEvent := &replication.BinlogEvent{RawData: rawData, Header: h, Event: e}
 		binEvent := &replication.BinlogEvent{Header: h, Event: e} // we donnot need raw data
 		oneMyEvent := &MyBinEvent{MyPos: mysql.Position{Name: *binlog, Pos: h.LogPos},
-			StartPos: tbMapPos}
+			StartPos: tbMapPos, ThreadID: currentThreadID}
 		//StartPos: h.LogPos - h.EventSize}
 		chRe = oneMyEvent.CheckBinEvent(cfg, binEvent, binlog)
 		if chRe == C_reBreak {
@@ -232,7 +239,7 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, evChan chan M
 				trxStatus = C_trxProcess
 			}
 
-			if cfg.WorkType != "stats" && oneMyEvent.IfRowsEvent {
+			if cfg.WorkType != "stats" {
 				ifSendEvent := false
 				if oneMyEvent.IfRowsEvent {
 					tbKey := GetAbsTableName(string(oneMyEvent.BinEvent.Table.Schema),

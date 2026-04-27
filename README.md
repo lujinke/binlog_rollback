@@ -90,6 +90,9 @@
         -tbs tb1,tb2
     5）支持以DML类型(update,delete,insert)条件过滤
         -sql delete,update
+    5.1）支持以thread_id条件过滤， 用于在同一时间/位置范围内进一步精确匹配某个连接产生的变更
+        -tid 12345
+        对于row格式DML，binlog中的rows event本身没有thread_id，binlog_rollback会读取同一事务前置QUERY_EVENT中的thread_id并应用到后续rows event。
     6) 支持分析本地binlog，也支持复制协议， binlog_rollback作为一个从库从主库拉binlog来本地解释
         -m file //解释本地binlog
         -m repl //binlog_rollback作为slave连接到主库拉binlog来解释

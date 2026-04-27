@@ -25,6 +25,7 @@ type ExtraSqlInfoOfPrint struct {
 	binlog    string
 	startpos  uint32
 	endpos    uint32
+	threadID  uint32
 	datetime  string
 	trxIndex  uint64
 	trxStatus int
@@ -172,8 +173,8 @@ func PrintExtraInfoForForwardRollbackupSql(cfg *ConfCmd, sqlChan chan ForwardRol
 
 func GetForwardRollbackContentLineWithExtra(sq ForwardRollbackSqlOfPrint, ifExtra bool) string {
 	if ifExtra {
-		return fmt.Sprintf("# datetime=%s database=%s table=%s binlog=%s startpos=%d stoppos=%d\n%s;\n",
-			sq.sqlInfo.datetime, sq.sqlInfo.schema, sq.sqlInfo.table, sq.sqlInfo.binlog, sq.sqlInfo.startpos,
+		return fmt.Sprintf("# datetime=%s thread_id=%d database=%s table=%s binlog=%s startpos=%d stoppos=%d\n%s;\n",
+			sq.sqlInfo.datetime, sq.sqlInfo.threadID, sq.sqlInfo.schema, sq.sqlInfo.table, sq.sqlInfo.binlog, sq.sqlInfo.startpos,
 			sq.sqlInfo.endpos, strings.Join(sq.sqls, ";\n"))
 	} else {
 
@@ -259,6 +260,7 @@ func GenForwardRollbackSqlFromBinEvent(i uint, cfg *ConfCmd, evChan chan MyBinEv
 			currentSqlForPrint = ForwardRollbackSqlOfPrint{sqls: []string{ev.OrgSql},
 				sqlInfo: ExtraSqlInfoOfPrint{schema: ev.QuerySql.Tables[0].Database, table: ev.QuerySql.Tables[0].Table,
 					binlog: ev.MyPos.Name, startpos: ev.StartPos, endpos: ev.MyPos.Pos,
+					threadID: ev.ThreadID,
 					datetime: GetDatetimeStr(int64(ev.Timestamp), int64(0), constvar.DATETIME_FORMAT_NOSPACE),
 					trxIndex: ev.TrxIndex, trxStatus: ev.TrxStatus}}
 
@@ -394,6 +396,7 @@ func GenForwardRollbackSqlFromBinEvent(i uint, cfg *ConfCmd, evChan chan MyBinEv
 			//fmt.Println(sqlArr)
 			currentSqlForPrint = ForwardRollbackSqlOfPrint{sqls: sqlArr,
 				sqlInfo: ExtraSqlInfoOfPrint{schema: db, table: tb, binlog: ev.MyPos.Name, startpos: ev.StartPos, endpos: ev.MyPos.Pos,
+					threadID: ev.ThreadID,
 					datetime: GetDatetimeStr(int64(ev.Timestamp), int64(0), constvar.DATETIME_FORMAT_NOSPACE),
 					trxIndex: ev.TrxIndex, trxStatus: ev.TrxStatus}}
 		}
