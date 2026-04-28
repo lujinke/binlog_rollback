@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"dannytools/ehand"
-	"dannytools/logging"
 	"fmt"
+	"github.com/jingchengli/dannytools/ehand"
+	"github.com/jingchengli/dannytools/logging"
 	"strings"
 
 	"github.com/siddontang/go-mysql/mysql"

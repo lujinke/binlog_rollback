@@ -1,10 +1,10 @@
 package main
 
 import (
-	"dannytools/ehand"
-	"dannytools/logging"
 	"database/sql"
 	"encoding/json"
+	"github.com/jingchengli/dannytools/ehand"
+	"github.com/jingchengli/dannytools/logging"
 	"strings"
 
 	"fmt"

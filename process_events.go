@@ -2,10 +2,10 @@ package main
 
 import (
 	"bufio"
-	"dannytools/constvar"
-	"dannytools/ehand"
-	"dannytools/logging"
 	"fmt"
+	"github.com/jingchengli/dannytools/constvar"
+	"github.com/jingchengli/dannytools/ehand"
+	"github.com/jingchengli/dannytools/logging"
 	"os"
 	"path/filepath"
 	"strings"

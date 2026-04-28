@@ -2,9 +2,9 @@ package main
 
 import (
 	"bytes"
-	"dannytools/ehand"
-	"dannytools/logging"
 	"fmt"
+	"github.com/jingchengli/dannytools/ehand"
+	"github.com/jingchengli/dannytools/logging"
 	"io"
 	"os"
 	"path/filepath"
@@ -109,15 +109,15 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, evChan chan M
 	// process: 0, continue: 1, break: 2, EOF: 3
 
 	var (
-		err         error
-		n           int64
-		db          string = ""
-		tb          string = ""
-		sql         string = ""
-		sqlType     string = ""
-		rowCnt      uint32 = 0
-		trxStatus   int    = 0
-		sqlLower    string = ""
+		err             error
+		n               int64
+		db              string = ""
+		tb              string = ""
+		sql             string = ""
+		sqlType         string = ""
+		rowCnt          uint32 = 0
+		trxStatus       int    = 0
+		sqlLower        string = ""
 		tbMapPos        uint32 = 0
 		currentThreadID uint32 = 0
 		orgSqlEvent     *replication.RowsQueryEvent

@@ -1,12 +1,12 @@
 package main
 
 import (
-	"dannytools/constvar"
-	"dannytools/ehand"
-	"dannytools/logging"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/jingchengli/dannytools/constvar"
+	"github.com/jingchengli/dannytools/ehand"
+	"github.com/jingchengli/dannytools/logging"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -14,8 +14,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pingcap/parser"
-	_ "github.com/pingcap/tidb/types/parser_driver"
 	"github.com/siddontang/go-mysql/mysql"
 	"github.com/toolkits/file"
 	sliceKits "github.com/toolkits/slice"
@@ -49,7 +47,7 @@ var (
 	gLogger             *logging.MyLog = &logging.MyLog{}
 	gConfCmd            *ConfCmd       = &ConfCmd{}
 	gBinlogTimeLocation *time.Location
-	gSqlParser          *parser.Parser = parser.New()
+	gSqlParser          interface{}
 
 	gUseDatabase string = ""
 
@@ -106,10 +104,10 @@ type ConfCmd struct {
 
 	//Databases    []string
 	//Tables       []string
-	DatabaseRegs []*regexp.Regexp
-	ifHasDbReg   bool
-	TableRegs    []*regexp.Regexp
-	ifHasTbReg   bool
+	DatabaseRegs  []*regexp.Regexp
+	ifHasDbReg    bool
+	TableRegs     []*regexp.Regexp
+	ifHasTbReg    bool
 	FilterSql     []string
 	FilterSqlLen  int
 	ThreadID      uint

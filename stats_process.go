@@ -1,11 +1,11 @@
 package main
 
 import (
-	"dannytools/constvar"
-	"dannytools/dsql"
-	"dannytools/ehand"
-	"dannytools/logging"
 	"fmt"
+	"github.com/GoDannyLai/binlog_rollback/dsql"
+	"github.com/jingchengli/dannytools/constvar"
+	"github.com/jingchengli/dannytools/ehand"
+	"github.com/jingchengli/dannytools/logging"
 	"os"
 	"path/filepath"
 

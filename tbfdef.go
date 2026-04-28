@@ -1,9 +1,9 @@
 package main
 
 import (
-	"dannytools/ehand"
-	"dannytools/logging"
 	"fmt"
+	"github.com/jingchengli/dannytools/ehand"
+	"github.com/jingchengli/dannytools/logging"
 )
 
 func GetTblDefFromDbAndMergeAndDump(cfg *ConfCmd) {
