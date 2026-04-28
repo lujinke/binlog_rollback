@@ -391,7 +391,7 @@
         ./binlog_rollback -h
         ```
         使用的其中两个依赖库https://github.com/siddontang/go-mysql与https://github.com/dropbox/godropbox/database/sqlbuilder
-        有修改小部分的源码，构建时会通过go.mod中的replace使用本仓库vendor中的修改版本。历史版本也可以按照 `开源库所做的修改.txt` 中来修改https://github.com/siddontang/go-mysql与https://github.com/dropbox/godropbox/database/sqlbuilder
+        有修改小部分的源码，本仓库已将修改后的源码直接保存在vendor目录中，构建时会通过go.mod中的replace使用这些本地版本，不需要再解压vendor.zip。历史版本也可以按照 `开源库所做的修改.txt` 中来修改https://github.com/siddontang/go-mysql与https://github.com/dropbox/godropbox/database/sqlbuilder
     2）使用
         *生成前滚SQL与DML报表:
             ./binlog_rollback.exe -m repl -w 2sql -M mysql -t 4 -mid 3331 -H 127.0.0.1 -P 3306 -u xxx -p xxx -dbs db1,db2 -tbs tb1,tb2 -sbin mysql-bin.000556 -spos 107 -ebin mysql-bin.000559 -epos 4 -e -f -r 20 -k -b 100 -l 10 -o /home/apps/tmp -dj tbs_all_def.json
