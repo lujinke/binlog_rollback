@@ -408,6 +408,11 @@ func (this *ConfCmd) CheckCmdOptions() {
 	//check --mtype
 	CheckElementOfSliceStr(gOptsValidMysqlType, this.MysqlType, "invalid arg for -M", true)
 
+	if this.MysqlType == "mariadb" && this.IfSetThreadID {
+		gLogger.WriteToLogByFieldsExitMsgNoErr("-tid thread_id filter only supports MySQL binlog, not MariaDB",
+			logging.ERROR, ehand.ERR_OPTION_MISMATCH)
+	}
+
 	if this.Mode != "file" && this.WorkType != "stats" {
 		//check --user
 		this.CheckRequiredOption(this.User, "-u must be set", true)
