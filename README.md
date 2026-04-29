@@ -384,9 +384,26 @@
         如果需要从源码编译，请先安装Go，然后在项目根目录执行：
         ```bash
         go mod tidy
+        ```
+        按目标平台选择对应的构建命令：
+        ```bash
+        # Linux x86_64
+        GOOS=linux GOARCH=amd64 go build -mod=mod -o binlog_rollback_linux_amd64 .
+
+        # macOS Intel
+        GOOS=darwin GOARCH=amd64 go build -mod=mod -o binlog_rollback_darwin_amd64 .
+
+        # macOS Apple Silicon
+        GOOS=darwin GOARCH=arm64 go build -mod=mod -o binlog_rollback_darwin_arm64 .
+
+        # Windows x86_64
+        GOOS=windows GOARCH=amd64 go build -mod=mod -o binlog_rollback_windows_amd64.exe .
+        ```
+        如果只需要构建当前平台版本，也可以执行：
+        ```bash
         go build -mod=mod -o binlog_rollback .
         ```
-        编译成功后会在当前目录生成可执行文件binlog_rollback，可以通过以下命令查看帮助信息：
+        编译成功后会在当前目录生成对应平台的可执行文件，可以通过以下命令查看帮助信息：
         ```bash
         ./binlog_rollback -h
         ```
